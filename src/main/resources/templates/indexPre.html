@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="commonHeader(title)">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <!--引入jQuery-->
+    <script src="/static/js/jquery/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/static/js/echarts/echarts.js" type="text/javascript" charset="utf-8"></script>
+
+    <script src="/static/js/html2canvas.js" type="text/javascript" charset="utf-8" async defer></script>
+    <script src="/static/js/canvas2image.js" type="text/javascript" charset="utf-8" async defer></script>
+
+    <!--element样式-->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <style>
+        .container {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="container" id="app">
+    <h1>echart</h1>
+    <div id="chart_info" style="width: 100%;height: 800px;"></div>
+    <h1>header</h1>
+    <div id="header_info">This is ppt header</div>
+    <h1>title</h1>
+    <div id="title_info">This is ppt title</div>
+    <h1>convert dom to img</h1>
+    <div style="margin-left: 40%">
+        <table id="table_lemon" style="border: black 1px solid;">
+            <tr>
+                <th>序号</th>
+                <th>姓名</th>
+                <th>性别</th>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>lemon</td>
+                <td>女</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>strawberry</td>
+                <td>男</td>
+            </tr>
+        </table>
+
+        <br>
+
+        <table id="table_sakura" style="border: black 1px solid;">
+            <tr>
+                <th>序号</th>
+                <th>姓名</th>
+                <th>性别</th>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>sakura</td>
+                <td>女</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>cloud</td>
+                <td>男</td>
+            </tr>
+        </table>
+    </div>
+    <button class="primary" onclick="postData()">发送打包数据请求</button>
+
+    <!--vue项目中-->
+    <!--<el-button type="primary">主要按钮</el-button>-->
+</div>
+</body>
+<!-- import Vue before Element -->
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<!-- import JavaScript -->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<!--vue 请求代码测试-->
+<script>
+    new Vue({
+        el: '#app',
+        data: function () {
+            return {visible: false}
+        }
+    });
+</script>
+
+
+
+<script type="text/javascript">
+    /*打包参数定义*/
+    var chartIds = ['chart_info'];
+    var textIds = ['header_info', 'title_info'];
+    /*domConvertImg*/
+    var domIds = ['table_lemon', 'table_sakura'];
+
+    $(function () {
+
+        /*初始化echarts*/
+        var myChart = echarts.init(document.getElementById('chart_info'));
+        var xAxisData = [];
+        var data1 = [];
+        var data2 = [];
+        for (var i = 0; i < 100; i++) {
+            xAxisData.push('类目' + i);
+            data1.push((Math.sin(i / 5) * (i / 5 -10) + i / 6) * 5);
+            data2.push((Math.cos(i / 5) * (i / 5 -10) + i / 6) * 5);
+        }
+        option = {
+            title: {
+                text: '柱状图动画延迟'
+            },
+            legend: {
+                data: ['bar', 'bar2'],
+                align: 'left'
+            },
+            toolbox: {
+                // y: 'bottom',
+                feature: {
+                    magicType: {
+                        type: ['stack', 'tiled']
+                    },
+                    dataView: {},
+                    saveAsImage: {
+                        pixelRatio: 2
+                    }
+                }
+            },
+            tooltip: {},
+            xAxis: {
+                data: xAxisData,
+                silent: false,
+                splitLine: {
+                    show: false
+                }
+            },
+            yAxis: {
+            },
+            series: [{
+                name: 'bar',
+                type: 'bar',
+                data: data1,
+                animationDelay: function (idx) {
+                    return idx * 10;
+                }
+            }, {
+                name: 'bar2',
+                type: 'bar',
+                data: data2,
+                animationDelay: function (idx) {
+                    return idx * 10 + 100;
+                }
+            }],
+            animationEasing: 'elasticOut',
+            animationDelayUpdate: function (idx) {
+                return idx * 5;
+            }
+        };
+
+        myChart.setOption(option);
+
+        console.log(JSON.stringify("start...." + domImgArr.length));
+        _previewReport.html2canvas($(".dataDiv"));
+        console.log(JSON.stringify("end...." + domImgArr.length));
+
+    });
+
+    /*文本参数打包*/
+    function packageText() {
+        var result = [];
+        $.each(textIds, function (index) {
+            result.push({
+                dataId: textIds[index],
+                dataType: 1,
+                // dataContent: $(`#${textIds[index]}`).text().replace(/[\r\n]/g, "").replace(/\ +/g, "").trim()
+                dataContent: $(`#${textIds[index]}`).text().replace(/[\r\n]/g, "")
+            });
+        });
+        return result;
+    }
+
+    /*图片参数打包*/
+    function packageCharts() {
+        var result = [];
+        $.each(chartIds, function (index) {
+            var pptModel = {
+                dataId: chartIds[index],
+                dataType: 5,
+                dataContent: '',
+                defaultContent: '',
+            };
+            var mychart = echarts.init(document.getElementById(chartIds[index]));
+            if (mychart._chartsViews.length == 0) {
+                pptModel.dataContent = "";
+            } else {
+                pptModel.dataContent = mychart.getDataURL().split('base64,')[1];
+            }
+            result.push(pptModel);
+        });
+        return result;
+    }
+
+    function packageDomObj() {
+        var selectors = [];
+        $.each(domIds, function (index, item) {
+            selectors.push($(`#${item}`));
+        });
+        return selectors;
+    }
+
+    /*牵涉到dom结构转图片时*/
+    var syncCanvasToImg = {
+        /**
+         * 将指定class的动态图截图并替换为静态图
+         * @param selector 选择器
+         */
+        html2canvas: function (selector, pptModelList) {
+            var canvasArr = [];
+            $.each(selector, function () {
+                var thisSelector = $(this);
+                //返回的是一个promise对象
+                var canvasResult = html2canvas(thisSelector, {
+                    backgroundColor: 'rgba(255,255,255,0)',
+                }, {
+                    // async:false,//同步执行
+                    onrendered: function (canvas) {
+                        var url = canvas.toDataURL();
+                        console.log(url);
+                    }
+                });
+                canvasArr.push(canvasResult);
+
+            });
+            Promise.all(canvasArr).then(function (response) {
+                console.log("所有异步请求执行结束之后调用");
+                $.each(response, function (index, item) {
+                    pptModelList.push({
+                        dataId: domIds[index],
+                        dataType: 5,
+                        dataContent: item.toDataURL().split('base64,')[1],
+                        defaultContent: '',
+                    })
+                });
+                debugger
+                /*执行其他参数的打包，或者是调用已经打包结束的参数集合*/
+                postImgData(pptModelList);
+            })
+        }
+    };
+
+    /*点击触发事件*/
+    function postData() {
+        var pptModelList = packageCharts().concat(packageText());
+        console.log(pptModelList);
+
+        /*如果需要一些页数的参数页面无法制造的*/
+        pptModelList.push({});
+        /*如果需要一些页数的参数页面无法制造的*/
+
+        syncCanvasToImg.html2canvas(packageDomObj(), pptModelList);
+
+    }
+
+    /*请求函数单独拎出*/
+    function postImgData(pptModelList) {
+        debugger
+        $.ajax({
+            url: `/renderReportParams?_t=${new Date().getTime()}`,
+            type: 'POST',
+            dataType: 'json',
+            contentType: 'application/json',
+            data: JSON.stringify(pptModelList),
+            success: function (data) {
+                console.log('render params success....')
+                console.log(data);
+            },
+            error: function (data) {
+                console.error('download ppt error', data);
+            }
+        });
+    }
+</script>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="commonHeader(title)">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <!--引入jQuery-->
+    <script src="/static/js/jquery/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/static/js/echarts/echarts.js" type="text/javascript" charset="utf-8"></script>
+
+    <script src="/static/js/html2canvas.js" type="text/javascript" charset="utf-8" async defer></script>
+    <script src="/static/js/canvas2image.js" type="text/javascript" charset="utf-8" async defer></script>
+
+    <!--无关样式为了美观-->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <style>
+        .container {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="app">
+        <h1>echart</h1>
+        <div id="chart_info" style="width: 100%;height: 800px;"></div>
+        <h1>header</h1>
+        <div id="header_info">This is ppt header</div>
+        <h1>title</h1>
+        <div id="title_info">This is ppt title</div>
+        <h1>convert dom to img</h1>
+
+        <button class="primary" onclick="postData()">发送打包数据请求</button>
+    </div>
+</body>
+
+
+
+<script type="text/javascript">
+    /*打包参数定义*/
+    var chartIds = ['chart_info'];
+    var textIds = ['header_info', 'title_info'];
+
+    $(function () {
+
+        /*初始化echarts*/
+        var myChart = echarts.init(document.getElementById('chart_info'));
+        var xAxisData = [];
+        var data1 = [];
+        var data2 = [];
+        for (var i = 0; i < 100; i++) {
+            xAxisData.push('类目' + i);
+            data1.push((Math.sin(i / 5) * (i / 5 -10) + i / 6) * 5);
+            data2.push((Math.cos(i / 5) * (i / 5 -10) + i / 6) * 5);
+        }
+        option = {
+            title: {
+                text: '柱状图动画延迟'
+            },
+            legend: {
+                data: ['bar', 'bar2'],
+                align: 'left'
+            },
+            toolbox: {
+                // y: 'bottom',
+                feature: {
+                    magicType: {
+                        type: ['stack', 'tiled']
+                    },
+                    dataView: {},
+                    saveAsImage: {
+                        pixelRatio: 2
+                    }
+                }
+            },
+            tooltip: {},
+            xAxis: {
+                data: xAxisData,
+                silent: false,
+                splitLine: {
+                    show: false
+                }
+            },
+            yAxis: {
+            },
+            series: [{
+                name: 'bar',
+                type: 'bar',
+                data: data1,
+                animationDelay: function (idx) {
+                    return idx * 10;
+                }
+            }, {
+                name: 'bar2',
+                type: 'bar',
+                data: data2,
+                animationDelay: function (idx) {
+                    return idx * 10 + 100;
+                }
+            }],
+            animationEasing: 'elasticOut',
+            animationDelayUpdate: function (idx) {
+                return idx * 5;
+            }
+        };
+
+        myChart.setOption(option);
+
+        console.log(JSON.stringify("start...." + domImgArr.length));
+        _previewReport.html2canvas($(".dataDiv"));
+        console.log(JSON.stringify("end...." + domImgArr.length));
+
+    });
+
+    /*文本参数打包*/
+    function packageText() {
+        var result = [];
+        $.each(textIds, function (index) {
+            result.push({
+                dataId: textIds[index],
+                dataType: 1,
+                // dataContent: $(`#${textIds[index]}`).text().replace(/[\r\n]/g, "").replace(/\ +/g, "").trim()
+                dataContent: $(`#${textIds[index]}`).text().replace(/[\r\n]/g, "")
+            });
+        });
+        return result;
+    }
+
+    /*图片参数打包*/
+    function packageCharts() {
+        var result = [];
+        $.each(chartIds, function (index) {
+            var pptModel = {
+                dataId: chartIds[index],
+                dataType: 5,
+                dataContent: '',
+                defaultContent: '',
+            };
+            var mychart = echarts.init(document.getElementById(chartIds[index]));
+            if (mychart._chartsViews.length == 0) {
+                pptModel.dataContent = "";
+            } else {
+                pptModel.dataContent = mychart.getDataURL().split('base64,')[1];
+            }
+            result.push(pptModel);
+        });
+        return result;
+    }
+
+    function postData() {
+        var pptModelList = packageCharts().concat(packageText());
+        console.log(pptModelList);
+
+
+        /*如果需要一些页数的参数页面无法制造的*/
+        pptModelList.push({});
+        /*如果需要一些页数的参数页面无法制造的*/
+
+        postImgData(pptModelList);
+    }
+
+    function postImgData(pptModelList) {
+        $.ajax({
+            url: `/renderReportParams?_t=${new Date().getTime()}`,
+            type: 'POST',
+            dataType: 'json',
+            contentType: 'application/json',
+            data: JSON.stringify(pptModelList),
+            success: function (data) {
+                console.log('render params success....')
+                console.log(data);
+            },
+            error: function (data) {
+                console.error('download ppt error', data);
+            }
+        });
+    }
+</script>
+</html>
