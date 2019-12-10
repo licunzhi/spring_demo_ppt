@@ -62,6 +62,10 @@ public class IndexController {
         File file = new File("E:/var/images/okjs.png");
         PptModel fileModel = new PptModel<File>().setDataId("file_img").setDataType(4).setDataContent(file);
         pptModelList.add(fileModel);
+
+        String dataStr = "MMMMMMM$NNNNNN$BBBBBB$ZZZZZZ|PPPPPP$OOOOOO$UUUUUU$YYYYYY|MMMMMMM$NNNNNN$BBBBBB$ZZZZZZ|OOOOOO$UUUUUU$YYYYYY$KLKLKLK";
+        PptModel tableData = new PptModel<String>().setDataId("table_begin_data").setDataType(6).setDataContent(dataStr);
+        pptModelList.add(tableData);
         /*----------------------------server params build end-------------------------------------*/
 
         // 需要删除的页面参数

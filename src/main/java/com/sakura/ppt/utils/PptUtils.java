@@ -1,6 +1,7 @@
 package com.sakura.ppt.utils;
 
 import com.sakura.ppt.model.PptModel;
+import org.apache.commons.codec.binary.StringUtils;
 import org.apache.poi.util.IOUtils;
 import org.apache.poi.xslf.usermodel.XMLSlideShow;
 import org.apache.poi.xslf.usermodel.XSLFGroupShape;
@@ -48,6 +49,9 @@ public class PptUtils {
     public static final int PICTRUE_FILE_DATA = 4;
     public static final int PICTRUE_BASE64_DATA = 5;
     public static final int TABLE_DATA = 6;
+
+    private static final String BIG_SPL = "\\|";
+    private static final String SAM_SPL = "\\$";
 
     /**
      * ppt创建封装方法入口
@@ -201,13 +205,29 @@ public class PptUtils {
             if (pptModel.getDataType() != TABLE_DATA) {
                 return;
             }
-            for (XSLFTableRow row : shape.getRows()) {
-                for (XSLFTableCell cell : row.getCells()) {
-                    String value = (pptModel.getDataContent() == null ? pptModel.getDefaultContent() :
-                            pptModel.getDataContent()).toString();
-                    String text = cell.getText().replaceAll(key, value).replaceAll("#", "");
-                    cell.setText(text);
+
+            String tableDataContent = (String) pptModel.getDataContent();
+            String[] outData = tableDataContent.split(BIG_SPL);
+            int dataLocation = 0;
+            int dataBeginIndex = 0;
+
+            for (int k = 0; k < shape.getRows().size(); k++) {
+                XSLFTableRow row = shape.getRows().get(k);
+                String dataKey = row.getCells().get(0).getText().replaceAll("#", "");
+                if (!StringUtils.equals(dataKey, key)) {
+                    continue;
+                } else {
+                    dataBeginIndex = dataBeginIndex == 0 ? k : dataBeginIndex;
                 }
+                if (dataLocation >= outData.length) {
+                    break;
+                }
+                String[] innerData = outData[dataLocation].split(SAM_SPL);
+                List<XSLFTableCell> cells = row.getCells();
+                for (int j = 0; j < cells.size(); j++) {
+                    cells.get(j).setText(innerData[j]);
+                }
+                dataLocation++;
             }
         }
     }
