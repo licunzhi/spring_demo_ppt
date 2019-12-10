@@ -138,7 +138,8 @@ public class PptUtils {
                         for (XSLFTextRun textRun : p.getTextRuns()) {
                             String value = (pptModel.getDataContent() == null ? pptModel.getDefaultContent() :
                                     pptModel.getDataContent()).toString();
-                            String text = textRun.getText().replaceAll("#" + key + "#", value);
+                            //String text = textRun.getText().replaceAll(key, value).replaceAll("#", "");
+                            String text = textRun.getText().replaceAll("#" + key + "#", "△" + value + "△").replaceAll("△", "");
                             textRun.setText(text);
                         }
                     }

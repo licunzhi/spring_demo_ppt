@@ -67,8 +67,8 @@ public class IndexController {
         PptModel tableData = new PptModel<String>().setDataId("table_begin_data").setDataType(6).setDataContent(dataStr);
         pptModelList.add(tableData);
 
-        PptModel max = new PptModel<String>().setDataId("MAX").setDataType(1).setDataContent("MMMMM");
-        PptModel maxCo = new PptModel<String>().setDataId("MAXCO").setDataType(1).setDataContent("TTTT");
+        PptModel max = new PptModel<String>().setDataId("MAXLENGTHDEMO").setDataType(1).setDataContent("MMMMM");
+        PptModel maxCo = new PptModel<String>().setDataId("MAXLENGTHDEMODEMO").setDataType(1).setDataContent("TTTT");
         pptModelList.add(max);
         pptModelList.add(maxCo);
         /*----------------------------server params build end-------------------------------------*/
