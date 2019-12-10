@@ -62,7 +62,7 @@ public class PptUtils {
      * @return 操作缓冲对象
      * @throws Exception
      */
-    public static XMLSlideShow createPtt(File file, List<PptModel> pptModelList, List<Integer> removeLists) throws Exception {
+    public static XMLSlideShow createPpt(File file, List<PptModel> pptModelList, List<Integer> removeLists) throws Exception {
         /*validate file exist*/
         if (file == null) {
             throw new FileNotFoundException("文件不存在");

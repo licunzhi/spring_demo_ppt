@@ -86,7 +86,7 @@ public class IndexController {
                 return "错误消息提示";
             }
 
-            XMLSlideShow xmlSlideShow = PptUtils.createPtt(pptFile, pptModelList, removeList);
+            XMLSlideShow xmlSlideShow = PptUtils.createPpt(pptFile, pptModelList, removeList);
             @Cleanup
             FileOutputStream fileOutputStream = new FileOutputStream(new File("result.pptx"));
             xmlSlideShow.write(fileOutputStream);

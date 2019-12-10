@@ -16,7 +16,7 @@ import lombok.experimental.Accessors;
  *     <li>3 : picture dataContent is picture path 图片路径</li>
  *     <li>4 : picture dataContent is picture file 文件类型</li>
  *     <li>5 : picture dataContent is base64 code base64 base64位数据</li>
- *     <li><s>6 : table 表格数据</s></li>
+ *     <li>6 : table 表格数据</li>
  * </ul>
  * @author lcz
  * @date 2019/06/18 09:43
