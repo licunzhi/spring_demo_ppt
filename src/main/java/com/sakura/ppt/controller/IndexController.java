@@ -74,7 +74,7 @@ public class IndexController {
         /*----------------------------server params build end-------------------------------------*/
 
         // 需要删除的页面参数
-        List<Integer> removeList = Arrays.asList(0, 2);
+        //List<Integer> removeList = Arrays.asList(0, 2);
 
         try {
 
@@ -91,7 +91,7 @@ public class IndexController {
                 return "错误消息提示";
             }
 
-            XMLSlideShow xmlSlideShow = PptUtils.createPpt(pptFile, pptModelList, removeList);
+            XMLSlideShow xmlSlideShow = PptUtils.createPpt(pptFile, pptModelList, null);
             @Cleanup
             FileOutputStream fileOutputStream = new FileOutputStream(new File("result.pptx"));
             xmlSlideShow.write(fileOutputStream);

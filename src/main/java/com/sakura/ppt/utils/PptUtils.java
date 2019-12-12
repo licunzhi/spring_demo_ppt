@@ -226,7 +226,14 @@ public class PptUtils {
                 String[] innerData = outData[dataLocation].split(SAM_SPL);
                 List<XSLFTableCell> cells = row.getCells();
                 for (int j = 0; j < cells.size(); j++) {
-                    cells.get(j).setText(innerData[j]);
+                    //cells.get(j).setText(innerData[j]);
+                    List<XSLFTextParagraph> textParagraphs = cells.get(j).getTextParagraphs();
+                    XSLFTextParagraph p = textParagraphs.get(0);
+                        String value = innerData[j];
+                        for (XSLFTextRun textRun : p.getTextRuns()) {
+                            textRun.setText("");
+                        }
+                        p.getTextRuns().get(0).setText(value);
                 }
                 dataLocation++;
             }
